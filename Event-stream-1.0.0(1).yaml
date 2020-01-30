@@ -1,0 +1,69 @@
+swagger: '2.0'
+info:
+  x-ibm-name: event-stream
+  title: Event-stream
+  version: 1.0.0
+  description: Cet API permet de publier un message dans Kafka
+schemes:
+  - https
+basePath: /topics
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  clientIdHeader:
+    type: apiKey
+    in: header
+    name: X-IBM-Client-Id
+security:
+  - clientIdHeader: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - value: Bearer TMMrJUnbX-PtNnAjnppoCBm-mzHDtJluqhnNe5b8QV1V
+              set: message.headers.Authorization
+          version: 1.0.0
+      - invoke:
+          target-url: 'https://icp-console.mlacluster3-4992a74c170c2d625055de3ecdf67a1a-0001.eu-de.containers.appdomain.cloud:30970/topics/MLA-Topic-Inject/records$(request.search)'
+          tls-profile: eventstream
+  phase: realized
+paths:
+  /MLA-Topic-Inject/records:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+      parameters:
+        - name: param-body
+          required: false
+          in: body
+          schema:
+            $ref: '#/definitions/Message-body'
+definitions:
+  Message-body:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Mess from API Connect
+tags: []
+parameters:
+  api_parameter:
+    name: api_parameter
+    type: string
+    required: false
+    in: query
+x-ibm-endpoints:
+  - endpointUrl: 'https://api.eu-de.apiconnect.ibmcloud.com/michellarafribmcom-dev/sb'
+    description: Base Gateway API Endpoint
+    type:
+      - production
+      - development
