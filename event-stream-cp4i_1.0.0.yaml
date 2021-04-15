@@ -1,0 +1,100 @@
+swagger: '2.0'
+info:
+  title: event-stream-cp4i
+  x-ibm-name: event-stream-cp4i
+  version: 1.0.0
+  description: Cet API permet de publier un message dans Kafka CP4i
+schemes:
+  - https
+basePath: /michel-lara/sandbox/cp4i/topics
+produces:
+  - application/json
+consumes:
+  - application/json
+security:
+  - clientIdHeader: []
+securityDefinitions:
+  clientIdHeader:
+    type: apiKey
+    description: cle d'api
+    name: X-IBM-Client-Id
+    in: header
+    x-key-type: client_id
+x-ibm-configuration:
+  cors:
+    enabled: true
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  application-authentication:
+    certificate: false
+  servers:
+    - url: >-
+        https://apicmla-gw-gateway-cp4i.mla4420-4992a74c170c2d625055de3ecdf67a1a-0000.eu-de.containers.appdomain.cloud/michel-lara/sandbox/cp4i/topics
+      description: ''
+  gateway: datapower-api-gateway
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          version: 2.0.0
+          verb: keep
+          target-url: >-
+            https://kafka-mini-ibm-es-recapi-external-cp4i.mlacluster-4-6-avr2021-4992a74c170c2d625055de3ecdf67a1a-0000.eu-de.containers.appdomain.cloud:443/topics/MLA-Topic-Inject/records$(request.search)
+          follow-redirects: false
+          timeout: 60
+          parameter-control:
+            type: blocklist
+            values: []
+          header-control:
+            type: blocklist
+            values: []
+          inject-proxy-headers: true
+          backend-type: json
+          tls-profile: 'eeventstreams:1.0.0'
+  properties:
+    target-url:
+      value: 'http://example.com/operation-name'
+      description: The URL of the target service
+      encoded: false
+  activity-log:
+    enabled: true
+    error-content: header
+    success-content: activity
+parameters:
+  api_parameter:
+    name: api_parameter
+    in: query
+    type: string
+definitions:
+  Message-body:
+    type: object
+    additionalProperties: false
+    properties:
+      message:
+        type: string
+        example: Message depuis API Connect
+paths:
+  /MLA-Topic-Inject/records:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+          schema:
+            type: string
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: param-body
+          in: body
+          required: false
+          schema:
+            $ref: '#/definitions/Message-body'
+        - name: Authorization
+          in: header
+          required: false
+          description: Basic
+          type: string
